@@ -47,8 +47,5 @@ These are some small scripts I use to write to simplify small tasks.
   A wifi-menu (connection manager) with a twist to allow refreshing of available networks.
 
 - youtube-pl.sh  
-  A terminal youtube audio player. Allows to play multiple videos.
-
-- youtube-pl2.sh  
-  A terminal youtube audio player. Allows to play multiple videos, moving back and forth in video.
+  A terminal youtube audio player. Allows playing multiple videos, audio traversal.
 

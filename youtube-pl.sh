@@ -1,5 +1,6 @@
 #!/bin/bash
 for i in "$@"; do
-    youtube-dl -q -o - $i | mplayer -novideo -really-quiet - 2>/dev/null 
+    URL=$(youtube-dl -q -g $i | awk 'NR%2==0')
+    mplayer -novideo $URL
 done;
 
