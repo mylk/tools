@@ -1,7 +1,6 @@
 #!/usr/bin/expect -f
-set examined_host "192.168.1.1"
-set username "my_username"
-set password "my_password"
+
+source secrets.tcl
 
 set timeout 4
 log_user 0
@@ -9,10 +8,10 @@ log_user 0
 set arg1 [lindex $argv 0];
 set arg2 [lindex $argv 1];
 
-if {$examined_host != ""} {
-    send_user "$examined_host: "
+if {$CISCO_HOST != ""} {
+    send_user "$CISCO_HOST: "
 
-    spawn telnet $examined_host
+    spawn telnet "$CISCO_HOST"
     match_max 100000
 
     expect {
@@ -31,12 +30,12 @@ if {$examined_host != ""} {
     }
 
     expect -re ".*sername:.*" {
-        send "$username\n"
+        send "$CISCO_USERNAME\n"
         send_user "Username sent, "
     }
 
     expect -re ".*assword:.*" {
-        send "$password\n"
+        send "$CISCO_PASSWORD\n"
         send_user "Password sent, "
     }
 
