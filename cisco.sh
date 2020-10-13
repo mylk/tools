@@ -1,6 +1,8 @@
 #!/usr/bin/expect -f
 
-source secrets.tcl
+set CURRENT_DIRECTORY [file dirname $argv0]
+
+source "${CURRENT_DIRECTORY}/secrets.tcl"
 
 set timeout 4
 log_user 0
