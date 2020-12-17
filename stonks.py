@@ -19,11 +19,17 @@ for stock in stocks:
     soup = BeautifulSoup(response.text, 'html.parser')
 
     price = soup.select('[data-locator="subtree-root"] [data-reactid="32"]')[1].string
-    
-    changes = soup.select('[data-locator="subtree-root"] [data-reactid="33"]')[2].string
-    change_percent = changes.split(' ')[1].replace('(', '').replace(')', '')
+    price_after_hours = soup.select('[data-locator="subtree-root"] [data-reactid="37"]')[1].string
+    if price_after_hours:
+        price = price_after_hours
 
-    items.append([stock, price, change_percent])
+    changes = soup.select('[data-locator="subtree-root"] [data-reactid="33"]')[2].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
+    changes_off_hours = soup.select('#quote-header-info > [data-reactid="29"] [data-reactid="36"] [data-reactid="40"]')
+    if changes_off_hours:
+        changes_off_hours = changes_off_hours[0].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
+        changes = round(float(changes_off_hours) + float(changes), 2)
+
+    items.append([stock, price, '{}%'.format(str(changes))])
 
 # print the names of the columns
 print ("{:<6} {:<6} {:<6}".format('NAME', 'PRICE', 'CHANGE'))
