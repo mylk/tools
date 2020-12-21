@@ -208,7 +208,7 @@ Do you want to keep the generated profile ('$PROFILE')?"
             dialog --yesno "$msg" 10 40 --stdout || rm "$PROFILE_DIR/$PROFILE"
             clear
         fi
-        return 2
+        return 3
     fi
     return 0
 }
