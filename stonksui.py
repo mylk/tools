@@ -11,17 +11,22 @@ stocks = ['tsla', 'aapl']
 
 
 def build_elements(main_loop=None, data=None):
+    global previous_results
+
     elements.clear()
 
     # add the current datetime
     last_update_txt = urwid.Text('')
-    last_update_txt.set_text(datetime.now().strftime('%c'))    
+    last_update_txt.set_text(datetime.now().strftime('%c'))
     elements.append(last_update_txt)
     elements.append(urwid.Text(''))
 
     results = crawl()
     for result in results:
         elements.append(urwid.Text(result))
+
+    # keep the results so the next crawl will compare prices to find out the trend
+    previous_results = results
 
     # this will throw an error the first time is ran
     try:
@@ -49,16 +54,26 @@ def crawl():
             changes_off_hours = changes_off_hours[0].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
             changes = round(float(changes_off_hours) + float(changes), 2)
 
-        items.append([stock, price, '{}%'.format(str(changes))])
+        # check if the stock price went up or down since the last crawl and choose a trend indicator
+        trend = '-'
+        for previous_result in previous_results:
+            previous_result = previous_result.split()
+            if previous_result[0].upper() == stock.upper():
+                if float(price) > float(previous_result[1]):
+                    trend = u'▲'
+                elif float(price) < float(previous_result[1]):
+                    trend = u'▼'
+
+        items.append([stock, price, '{}%'.format(str(changes)), trend])
 
     results = list()
     # set the columns
-    results.append('{:<6} {:<6} {:<6}'.format('NAME', 'PRICE', 'CHANGE'))
+    results.append('{:<5} {:<6} {:<7} {:<6}'.format('NAME', 'PRICE', 'CHANGE', 'TREND'))
 
     # set the data
     for item in items:
-        name, price, change = item
-        results.append('{:<6} {:<6} {:<6}'.format(name.upper(), price, change))
+        name, price, change, trend = item
+        results.append('{:<5} {:<6} {:<7} {:<6}'.format(name.upper(), price, change, trend))
 
     return results
 
@@ -76,6 +91,7 @@ if __name__ == '__main__':
     # call the handler when SIGINT is received
     signal(SIGINT, handle_sigint)
 
+    previous_results = []
     elements = urwid.SimpleListWalker([])
     build_elements()
 
