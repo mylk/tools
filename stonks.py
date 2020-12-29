@@ -10,9 +10,14 @@
 
 from bs4 import BeautifulSoup
 import requests
+import sys
 
-stocks = ['tsla', 'aapl']
+stock_defaults = ['aapl', 'tsla']
+
 items = []
+
+arguments = sys.argv[1:]
+stocks = arguments if arguments else stock_defaults
 
 for stock in stocks:
     response = requests.get('https://finance.yahoo.com/quote/{}/'.format(stock))

@@ -7,7 +7,7 @@ from signal import signal, SIGINT
 import sys
 import urwid
 
-stocks = ['tsla', 'aapl']
+stock_defaults = ['aapl', 'tsla']
 
 
 def build_elements(main_loop=None, data=None):
@@ -37,6 +37,9 @@ def build_elements(main_loop=None, data=None):
 
 # same as stonks.py, but without printing
 def crawl():
+    arguments = sys.argv[1:]
+    stocks = arguments if arguments else stock_defaults
+
     items = []
 
     for stock in stocks:
