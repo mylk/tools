@@ -4,8 +4,14 @@ These are some small scripts I use to write to simplify small tasks.
 - backlight.sh  
   Increase / decrease the brightness of the monitor (useful for keyboard shortcuts)
 
+- cases.sh  
+  Shoes today's COVID-19 cases in Greece.
+
 - cisco.sh  
   Basic Cisco router tasks (restarting, wifi management).
+
+- digital-ocean-droplet-restart.sh  
+  Restarts a Digital Ocean droplet.
 
 - eortologion.sh  
   Shows today's name days (Greek).
@@ -20,16 +26,28 @@ These are some small scripts I use to write to simplify small tasks.
   An alternative to killall with better process name matching.
 
 - proxy-finder.sh  
-  Finds a tests anonymous proxy on a given IP address range.
+  Finds and tests anonymous proxies on a given IP address range.
 
 - rip-stream.sh  
   Rips an online radio stream
+
+- router-technicolor-td5130-restart.sh  
+  Restarts a Technicolor TD5130 router.
+
+- rss-reader.sh  
+  Shows unread Liferea RSS reader items.
 
 - samba-scan.sh  
   A Samba service scanner that tests the discovered hosts for shared disks.
 
 - showmyip.sh  
   Shows your public IP address.
+
+- spotify-dl.sh  
+  Downloads the given Spotify podcast.
+
+- stonks.py  
+  Shows the price a percentage change of given stonks.
 
 - tcpview.sh  
   A Sysinternals' TCPView-like representation of open TCP connection and listening ports.
@@ -48,4 +66,3 @@ These are some small scripts I use to write to simplify small tasks.
 
 - youtube-pl.sh  
   A terminal youtube audio player. Allows playing multiple videos, audio traversal.
-
