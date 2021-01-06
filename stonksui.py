@@ -46,12 +46,20 @@ def crawl():
         response = requests.get('https://finance.yahoo.com/quote/{}/'.format(stock))
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        price = soup.select('[data-locator="subtree-root"] [data-reactid="32"]')[1].string
-        price_after_hours = soup.select('[data-locator="subtree-root"] [data-reactid="37"]')[1].string
+        price = soup.select('[data-locator="subtree-root"] [data-reactid="32"]')
+        price_after_hours = soup.select('[data-locator="subtree-root"] [data-reactid="37"]')
+        changes = soup.select('[data-locator="subtree-root"] [data-reactid="33"]')
+
+        if not len(price) or not len(price_after_hours) or not len(changes):
+            return []
+
+        price = price[1].string
+        price_after_hours = price_after_hours[1].string
+
         if price_after_hours:
             price = price_after_hours
 
-        changes = soup.select('[data-locator="subtree-root"] [data-reactid="33"]')[2].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
+        changes = changes[2].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
         changes_off_hours = soup.select('#quote-header-info > [data-reactid="29"] [data-reactid="36"] [data-reactid="40"]')
         if changes_off_hours:
             changes_off_hours = changes_off_hours[0].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
