@@ -25,6 +25,9 @@ These are some small scripts I use to write to simplify small tasks.
 - killz.sh  
   An alternative to killall with better process name matching.
 
+- liferea-xvfb.sh  
+  Runs Liferea RSS reader in a virtual framebuffer.
+
 - proxy-finder.sh  
   Finds and tests anonymous proxies on a given IP address range.
 
