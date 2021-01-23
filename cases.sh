@@ -1,6 +1,7 @@
 #!/bin/bash
 
 TODAY=`command date '+%d/%m/%Y'`
+TODAY_MONTH_NO_ZERO_PADDING=`command date '+%d/%_m/%Y' | sed 's/\s//g'`
 # prefixed with "command" to override aliases of date command (ex. defined in .bashrc)
 
 echo "${TODAY}"
@@ -9,4 +10,4 @@ curl -s --compressed 'https://flo.uri.sh/visualisation/3334247/embed?auto=1' -H 
 grep "_Flourish_data = " | \
 awk -F "= " '{print($2)}' | \
 sed 's/.$//' | \
-jq -r ".[][] | select(.label == \"${TODAY}\")[\"value\"][]"
+jq -r ".[][] | select(.label == \"${TODAY}\" or .label == \"${TODAY_MONTH_NO_ZERO_PADDING}\")[\"value\"][]"
