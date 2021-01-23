@@ -28,6 +28,9 @@ These are some small scripts I use to write to simplify small tasks.
 - liferea-xvfb.sh  
   Runs Liferea RSS reader in a virtual framebuffer.
 
+- qr-generator.py
+  Generates a QR code for the given string and opens it on Firefox.
+
 - proxy-finder.sh  
   Finds and tests anonymous proxies on a given IP address range.
 
