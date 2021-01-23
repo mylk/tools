@@ -40,8 +40,8 @@ These are some small scripts I use to write to simplify small tasks.
 - router-technicolor-td5130-restart.sh  
   Restarts a Technicolor TD5130 router.
 
-- rss-reader.sh  
-  Shows unread Liferea RSS reader items.
+- rss-reader.py
+  An incomplete RSS reader currently dependent on Liferea's database and fetching functionality.
 
 - samba-scan.sh  
   A Samba service scanner that tests the discovered hosts for shared disks.
