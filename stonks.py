@@ -36,9 +36,13 @@ def build_elements(main_loop=None, data=None):
     # keep the results so the next crawl will compare prices to find out the trend
     previous_results = results
 
+
+def schedule_and_build_elements(main_loop=None, data=None):
+    build_elements(main_loop)
+
     # this will throw an error the first time is ran
     try:
-        loop.set_alarm_in(args.interval, build_elements)
+        main_loop.set_alarm_in(args.interval, schedule_and_build_elements)
     except NameError:
         pass
 
@@ -99,6 +103,8 @@ def crawl():
 def handle_quit(key):
     if key in ['q', 'Q']:
         raise urwid.ExitMainLoop()
+    elif key == 'u':
+        build_elements()
 
 
 def handle_sigint(signal_received, frame):
@@ -120,7 +126,6 @@ if __name__ == '__main__':
 
     elements = urwid.SimpleListWalker([])
     build_elements()
-
     main = urwid.ListBox(elements)
 
     top = urwid.Overlay(
@@ -135,5 +140,5 @@ if __name__ == '__main__':
     )
 
     loop = urwid.MainLoop(top, palette=[('reversed', 'standout', '')], unhandled_input=handle_quit)
-    loop.set_alarm_in(args.interval, build_elements)
+    loop.set_alarm_in(args.interval, schedule_and_build_elements)
     loop.run()
