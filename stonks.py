@@ -21,17 +21,19 @@ args = parser.parse_args()
 def build_elements(main_loop=None, data=None):
     global previous_results
 
-    elements.clear()
-
-    # add the current datetime
+    # set the current datetime
     last_update_txt = urwid.Text('')
     last_update_txt.set_text(datetime.now().strftime('%c'))
-    elements.append(last_update_txt)
-    elements.append(urwid.Text(''))
 
     results = crawl()
+    elements = urwid.SimpleListWalker([])
     for result in results:
         elements.append(urwid.Text(result))
+
+    elements_list = urwid.ListBox(elements)
+    pile = urwid.Pile([last_update_txt, urwid.Divider(), (100, elements_list)])
+    widget = urwid.Filler(pile, valign='top')
+    main_loop.widget = widget
 
     # keep the results so the next crawl will compare prices to find out the trend
     previous_results = results
@@ -40,11 +42,7 @@ def build_elements(main_loop=None, data=None):
 def schedule_and_build_elements(main_loop=None, data=None):
     build_elements(main_loop)
 
-    # this will throw an error the first time is ran
-    try:
-        main_loop.set_alarm_in(args.interval, schedule_and_build_elements)
-    except NameError:
-        pass
+    main_loop.set_alarm_in(args.interval, schedule_and_build_elements)
 
 
 # same as stonks.py, but without printing
@@ -104,7 +102,7 @@ def handle_quit(key):
     if key in ['q', 'Q']:
         raise urwid.ExitMainLoop()
     elif key == 'u':
-        build_elements()
+        build_elements(loop)
 
 
 def handle_sigint(signal_received, frame):
@@ -124,21 +122,11 @@ if __name__ == '__main__':
     # call the handler when SIGINT is received
     signal(SIGINT, handle_sigint)
 
-    elements = urwid.SimpleListWalker([])
-    build_elements()
-    main = urwid.ListBox(elements)
-
-    top = urwid.Overlay(
-        main,
-        urwid.SolidFill(),
-        align='left',
-        width=('relative', 30),
-        valign='top',
-        height=('relative', 50),
-        min_width=20,
-        min_height=5
-    )
-
-    loop = urwid.MainLoop(top, palette=[('reversed', 'standout', '')], unhandled_input=handle_quit)
+    pile = urwid.Pile([])
+    widget = urwid.Filler(pile, valign='top')
+    loop = urwid.MainLoop(widget, palette=[('reversed', 'standout', '')], unhandled_input=handle_quit)
     loop.set_alarm_in(args.interval, schedule_and_build_elements)
+
+    build_elements(loop)
+
     loop.run()
