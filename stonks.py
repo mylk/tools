@@ -27,10 +27,14 @@ def build_elements(main_loop=None, data=None):
 
     results = crawl()
     elements = urwid.SimpleListWalker([])
-    for result in results:
-        elements.append(urwid.Text(result))
+    if not results:
+        elements.append(urwid.Text('Could not fetch data.'))
+    else:
+        for result in results:
+            elements.append(urwid.Text(result))
 
     elements_list = urwid.ListBox(elements)
+
     pile = urwid.Pile([last_update_txt, urwid.Divider(), (100, elements_list)])
     widget = urwid.Filler(pile, valign='top')
     main_loop.widget = widget
@@ -52,7 +56,11 @@ def crawl():
     items = []
 
     for stock in stocks:
-        response = requests.get('https://finance.yahoo.com/quote/{}/'.format(stock))
+        try:
+            response = requests.get('https://finance.yahoo.com/quote/{}/'.format(stock))
+        except requests.exceptions.ConnectionError:
+            return []
+
         soup = BeautifulSoup(response.text, 'html.parser')
 
         price = soup.select('[data-locator="subtree-root"] [data-reactid="32"]')
