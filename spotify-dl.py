@@ -11,6 +11,7 @@
 
 from bs4 import BeautifulSoup
 import json
+import re
 import requests
 import sys
 from urllib.parse import urlparse
@@ -46,6 +47,9 @@ def scrape(episode_id):
     return result
 
 def download(episode_metadata):
+    chars_to_remove = [';', '/']
+    episode_metadata['filename'] = re.sub('|'.join(chars_to_remove), '', episode_metadata['filename'])
+
     episode_file = requests.get(episode_metadata['url'])
     open('{}.mp3'.format(episode_metadata['filename']), 'wb').write(episode_file.content)
 
