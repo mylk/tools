@@ -34,6 +34,9 @@ These are some small scripts I use to write to simplify small tasks.
 - proxy-finder.sh  
   Finds and tests anonymous proxies on a given IP address range.
 
+- revolut-has.sh
+  Checks if the given ticker exists in Revolut stocks.
+
 - rip-stream.sh  
   Rips an online radio stream
 
