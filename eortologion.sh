@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get the data
-OUTPUT=`wget -o /dev/null -O - "http://www.eortologio.gr/export_code/eortologio_xhtml.php?morfi=1&what_day=1" | iconv -f WINDOWS-1253 -t UTF8`
+OUTPUT=`wget -o /dev/null -O - "http://www.actus.gr/export_code/eortologio_xhtml.php?morfi=1&what_day=1" | iconv -f WINDOWS-1253 -t UTF8`
 
 # find data length
 LENGTH=`echo $OUTPUT | wc -m`
