@@ -31,6 +31,9 @@ These are some small scripts I use to write to simplify small tasks.
 - qr-generator.py
   Generates a QR code for the given string and opens it on Firefox.
 
+- pinguntil.sh
+  Pings the given IP address until it's rechable.
+
 - proxy-finder.sh  
   Finds and tests anonymous proxies on a given IP address range.
 
