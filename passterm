@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo "Invalid number of arguments."
+    exit 1
+fi
+
+# check that xclip is installed
+which xclip >& /dev/null
+if [ $? -ne 0 ]; then
+    echo "xclip is required."
+    exit 1
+fi
+
+# copy the data currently in clipboard to restore later
+export EXCLIPPED=$(xclip -o 2> /dev/null)
+
+# retrieve and copy the password to clipboard
+pass $1 | tr -d '\n' | xclip -selection clipboard 2> /dev/null;
+
+# restore the previous clipbard data after 45 seconds
+((sleep 45; echo -n $EXCLIPPED | xclip -selection clipboard)&)
+
+echo "Copied $1 to clipboard. Will clear in 45 seconds."
+
+exit 0
+

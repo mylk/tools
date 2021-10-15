@@ -31,6 +31,9 @@ These are some small scripts I use to write to simplify small tasks.
 - qr-generator.py
   Generates a QR code for the given string and opens it on Firefox.
 
+- passterm
+  A passmenu clone for the terminal, to temporarily copy passwords to clipboard using pass.
+
 - pinguntil.sh
   Pings the given IP address until it's rechable.
 
