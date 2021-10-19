@@ -19,7 +19,7 @@ export EXCLIPPED=$(xclip -o 2> /dev/null)
 PASS=`pass $1`
 
 # password could not be retrieved (non existing or invalid credentials)
-if [ $? -gt 1 ]; then
+if [ $? -ne 0 ]; then
     exit 1;
 fi
 
