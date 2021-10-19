@@ -15,8 +15,16 @@ fi
 # copy the data currently in clipboard to restore later
 export EXCLIPPED=$(xclip -o 2> /dev/null)
 
-# retrieve and copy the password to clipboard
-pass $1 | tr -d '\n' | xclip -selection clipboard 2> /dev/null;
+# retrieve the password
+PASS=`pass $1`
+
+# password could not be retrieved (non existing or invalid credentials)
+if [ $? -gt 1 ]; then
+    exit 1;
+fi
+
+# copy the password to clipboard
+echo $PASS | tr -d '\n' | xclip -selection clipboard 2> /dev/null;
 
 # restore the previous clipbard data after 45 seconds
 ((sleep 45; echo -n $EXCLIPPED | xclip -selection clipboard)&)
