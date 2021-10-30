@@ -122,6 +122,11 @@ if __name__ == '__main__':
 
     if not args.update:
         results = crawl()
+
+        if not results:
+            print('Could not fetch data.')
+            sys.exit(1)
+
         for result in results:
             print(result)
 
