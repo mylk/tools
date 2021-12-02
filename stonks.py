@@ -3,12 +3,21 @@
 import argparse
 from bs4 import BeautifulSoup
 from datetime import datetime
+from fake_useragent import UserAgent
 import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 from signal import signal, SIGINT
 import sys
+import time
 import urwid
 
 stock_defaults = ['aapl', 'tsla']
+element_root = '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[5]/div/div/div/div[3]/div[1]'
 
 # parse parameters
 parser = argparse.ArgumentParser(description='List the price and % change of stonks.')
@@ -16,6 +25,16 @@ parser.add_argument('-i', '--interval', dest='interval', help='Interval in secon
 parser.add_argument('-t', '--tickers', dest='tickers', help='Show specific stonk data. For multiple, comma-separate them', default='', type=str)
 parser.add_argument('-u', '--update', dest='update', help='Update the data (every five minutes by default)', default=None, action='store_true')
 args = parser.parse_args()
+
+
+def get_webdriver():
+    service = Service('/tmp/chromedriver')
+
+    options = Options()
+    options.headless = True
+    options.add_argument('--window-size=1920,1080')
+    options.add_argument('user-agent={}'.format(UserAgent().random))
+    return webdriver.Chrome(options=options, service=service)
 
 
 def build_elements(main_loop=None, data=None):
@@ -51,36 +70,58 @@ def schedule_and_build_elements(main_loop=None, data=None):
 
 # same as stonks.py, but without printing
 def crawl():
+    driver = get_webdriver()
     stocks = args.tickers.split(',') if args.tickers else stock_defaults
 
     items = []
 
+    accepted_terms = False
     for stock in stocks:
         try:
-            response = requests.get('https://finance.yahoo.com/quote/{}/'.format(stock))
-        except requests.exceptions.ConnectionError:
+            driver.get('https://finance.yahoo.com/quote/{}/'.format(stock))
+        except Exception as ex:
             return []
 
-        soup = BeautifulSoup(response.text, 'html.parser')
+        if not accepted_terms:
+            # wait until the terms window is loaded
+            # selenium.common.exceptions.TimeoutException
+            WebDriverWait(driver, 30).until(
+                expected_conditions.presence_of_element_located((By.CSS_SELECTOR, 'form.consent-form button.btn.primary'))
+            )
+            driver.find_elements(By.CSS_SELECTOR, 'form.consent-form button.btn.primary')[0].click()
+            accepted_terms = True
 
-        price = soup.select('#quote-header-info [data-reactid="31"]')
-        price_after_hours = soup.select('#quote-header-info [data-reactid="37"]')
-        changes = soup.select('#quote-header-info [data-reactid="32"]')
+        WebDriverWait(driver, 30).until(
+            expected_conditions.presence_of_element_located((By.XPATH, '{}/div[1]/fin-streamer[1]'.format(element_root)))
+        )
+        price = driver.find_elements(By.XPATH, '{}/div[1]/fin-streamer[1]'.format(element_root))[0].text
+        change_amount = driver.find_elements(By.XPATH, '{}/div/fin-streamer[2]/span'.format(element_root))[0].text
+        change_percent = driver.find_elements(By.XPATH, '{}/div/fin-streamer[3]/span'.format(element_root))[0].text.replace('(', '').replace(')', '').replace('%', '')
 
-        if not len(price) or not len(price_after_hours) or not len(changes):
-            return []
+        # check if there is an after hours div to wait for the values to load
+        after_hours_div = driver.find_elements(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[5]/div/div/div/div[3]/div[1]/div[2]')
+        if after_hours_div:
+            WebDriverWait(driver, 120).until(
+                expected_conditions.presence_of_element_located((By.XPATH, '{}/div[2]/fin-streamer[2]'.format(element_root)))
+            )
 
-        price = price[0].string
-        price_after_hours = price_after_hours[0].string
+        price_after_hours = driver.find_elements(By.XPATH, '{}/div[2]/fin-streamer[2]'.format(element_root))
+        if price_after_hours:
+            price_after_hours = price_after_hours[0].text
+
+        change_off_hours_amount = driver.find_elements(By.XPATH, '{}/div[2]/span[1]/fin-streamer[1]/span'.format(element_root))
+        if change_off_hours_amount:
+            change_off_hours_amount = change_off_hours_amount[0].text
+
+        change_off_hours_percent = driver.find_elements(By.XPATH, '{}/div[2]/span[1]/fin-streamer[2]/span'.format(element_root))
+        if change_off_hours_percent:
+            change_off_hours_percent = change_off_hours_percent[0].text.replace('(', '').replace(')', '').replace('%', '')
 
         if price_after_hours:
             price = price_after_hours
-
-        changes = changes[0].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
-        changes_off_hours = soup.select('#quote-header-info > [data-reactid="29"] [data-reactid="36"] [data-reactid="40"]')
-        if changes_off_hours:
-            changes_off_hours = changes_off_hours[0].string.split(' ')[1].replace('(', '').replace(')', '').replace('%', '')
-            changes = round(float(changes_off_hours) + float(changes), 2)
+            change_amount = round(float(change_off_hours_amount) + float(change_amount), 2)
+            # TypeError: float() argument must be a string or a real number, not 'list'
+            change_percent = round(float(change_off_hours_percent) + float(change_percent), 2)
 
         # check if the stock price went up or down since the last crawl and choose a trend indicator
         trend = '-'
@@ -92,7 +133,7 @@ def crawl():
                 elif float(price) < float(previous_result[1]):
                     trend = u'▼'
 
-        items.append([stock, price, '{}%'.format(str(changes)), trend])
+        items.append([stock, price, '{}%'.format(str(change_percent)), trend])
 
     results = list()
     # set the columns
@@ -100,8 +141,10 @@ def crawl():
 
     # set the data
     for item in items:
-        name, price, change, trend = item
-        results.append('{:<5} {:<6} {:<7} {:<6}'.format(name.upper(), price, change, trend))
+        name, price, change_percent, trend = item
+        results.append('{:<5} {:<6} {:<7} {:<6}'.format(name.upper(), price, change_percent, trend))
+
+    driver.close()
 
     return results
 
