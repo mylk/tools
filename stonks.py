@@ -15,6 +15,7 @@ from signal import signal, SIGINT
 import sys
 import time
 import urwid
+from webdriver_manager.chrome import ChromeDriverManager
 
 stock_defaults = ['aapl', 'tsla']
 element_root = '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[5]/div/div/div/div[3]/div[1]'
@@ -28,7 +29,7 @@ args = parser.parse_args()
 
 
 def get_webdriver():
-    service = Service('/tmp/chromedriver')
+    service = Service(ChromeDriverManager().install())
 
     options = Options()
     options.headless = True
