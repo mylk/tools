@@ -4,6 +4,7 @@ import argparse
 from bs4 import BeautifulSoup
 from datetime import datetime
 from fake_useragent import UserAgent
+import os
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -16,6 +17,8 @@ import sys
 import time
 import urwid
 from webdriver_manager.chrome import ChromeDriverManager
+
+os.environ['WDM_LOG_LEVEL'] = '0'
 
 stock_defaults = ['aapl', 'tsla']
 element_root = '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[5]/div/div/div/div[3]/div[1]'
