@@ -12,7 +12,7 @@ echo "Started at:" `date +%H:%M:%S --date="@$TIME_START"`;
 # -T4 is the equivalent of --max-rtt-timeout 1250ms --initial-rtt-timeout 500ms --max-retries 6 and sets the maximum TCP scan delay to 10ms
 # -T3 is the default
 # http://nmap.org/book/man-performance.html
-OPEN_HOSTS=`sudo nmap -sS -n -T4 -p 139 $1 $2 --open -oG - | grep open | grep -v Nmap | awk '{print($2)}'`;
+OPEN_HOSTS=`sudo nmap -sS -n -T4 -p 139 $* --open -oG - | grep open | grep -v Nmap | awk '{print($2)}'`;
 
 
 # echoes end time
