@@ -1,3 +1,3 @@
 #!/bin/bash
 
-watch -pn 0.1 "netstat -pat"
+watch -pn 1 "netstat -pat"
