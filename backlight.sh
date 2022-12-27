@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# have to set some permissions
+# https://stackoverflow.com/a/39230095
+
 FILE="/sys/class/backlight/intel_backlight/brightness"
 CURRENT=$(cat "$FILE")
 
